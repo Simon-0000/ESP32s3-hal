@@ -26,14 +26,11 @@ template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 void MotorControlPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t timerResolutionHz,const uint32_t ticksPeriod, const mcpwm_timer_count_mode_t countMode)
 {
     mcpwm_timer_config_t timerConfig = {
-        groupId,
-        clkSrc,
-        timerResolutionHz,
-        countMode,
-        ticksPeriod,
-        0,
-        {}
-        
+        .group_id = groupId,
+        .clk_src = clkSrc,
+        .resolution_hz = timerResolutionHz,
+        .count_mode = countMode,
+        .period_ticks = ticksPeriod
     };
     ESP_ERROR_CHECK(mcpwm_new_timer(&timerConfig, &timer_));
 
