@@ -4,10 +4,10 @@
 #include "TimerPWM.hpp"
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-class MotorControlPWM : public TimerPWM{
+class MCPWM : public TimerPWM{
 public:
-    MotorControlPWM(const int pwmGpio, const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz, const uint32_t ticksPeriod );
-    MotorControlPWM(const int pwmGpio);
+    MCPWM(const int pwmGpio, const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz, const uint32_t ticksPeriod );
+    MCPWM(const int pwmGpio);
     void setPwmTicks(const uint32_t pwmTicks);
     void setPwm(const uint32_t pwm) override;
 protected:
@@ -26,4 +26,4 @@ private:
     mcpwm_oper_handle_t operator_ = NULL;  
 };
 
-#include "MotorControlPWM.tpp"
+#include "MCPWM.tpp"

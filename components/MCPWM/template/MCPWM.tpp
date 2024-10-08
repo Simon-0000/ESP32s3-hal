@@ -1,11 +1,10 @@
 #pragma once
-#include "MotorControlPWM.hpp"
+#include "MCPWM.hpp"
 #include "esp_log.h"
-// static const char* TAG = "MotorControlPWM";
 
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-MotorControlPWM<clkSrc,groupId>::MotorControlPWM(const int pwmGpio,const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz,const uint32_t ticksPeriod):
+MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio,const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz,const uint32_t ticksPeriod):
     pwmGpio_(pwmGpio)
 {
     ticksThreshold_ = ticksPeriod;
@@ -16,25 +15,28 @@ MotorControlPWM<clkSrc,groupId>::MotorControlPWM(const int pwmGpio,const mcpwm_t
     createComparatorAndGenerator();
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-MotorControlPWM<clkSrc,groupId>::MotorControlPWM(const int pwmGpio): pwmGpio_(pwmGpio)
+MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio): pwmGpio_(pwmGpio)
 {
     createComparatorAndGenerator();
 }
 
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t timerResolutionHz,const uint32_t ticksPeriod, const mcpwm_timer_count_mode_t countMode)
+void MCPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t timerResolutionHz,const uint32_t ticksPeriod, const mcpwm_timer_count_mode_t countMode)
 {
+    
     mcpwm_timer_config_t timerConfig = {
         .group_id = groupId,
         .clk_src = clkSrc,
         .resolution_hz = timerResolutionHz,
         .count_mode = countMode,
-        .period_ticks = ticksPeriod
+        .period_ticks = ticksPeriod,
+        .intr_priority = 0,
+        .flags = {1,0}
     };
     ESP_ERROR_CHECK(mcpwm_new_timer(&timerConfig, &timer_));
 
-    if(operator_ != NULL)
+    if(operator_ == NULL)
     {
         mcpwm_operator_config_t operatorConfig = {
             groupId,
@@ -48,7 +50,7 @@ void MotorControlPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t time
 }
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::createComparatorAndGenerator(){
+void MCPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 
 
     mcpwm_comparator_config_t comparatorConfig = {
@@ -66,12 +68,12 @@ void MotorControlPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 }
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupeId>
-void MotorControlPWM<clkSrc,groupeId>::setPwmTicks(const uint32_t pwmTicks)
+void MCPWM<clkSrc,groupeId>::setPwmTicks(const uint32_t pwmTicks)
 {
     ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_, pwmTicks));
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupeId>
-void MotorControlPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
+void MCPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
 {
     setPwmTicks(pwm / static_cast<float>(UINT32_MAX) * ticksThreshold_);
 }
@@ -80,10 +82,10 @@ void MotorControlPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
 
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::enableTimer(){
+void MCPWM<clkSrc,groupId>::enableTimer(){
     mcpwm_timer_enable(timer_);
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::disableTimer(){
+void MCPWM<clkSrc,groupId>::disableTimer(){
     mcpwm_timer_disable(timer_);
 }

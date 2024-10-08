@@ -3,11 +3,12 @@
 #include "Gpio.hpp"
 #include <cstdlib>
 
+
 class DCMotor{
 public:
     DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise);
     void setSpeed(const int speed);
-    void setSpeedDirection(bool direction);
+    esp_err_t setSpeedDirection(bool direction);
     void enable();
     void disable();
     void toggle();
