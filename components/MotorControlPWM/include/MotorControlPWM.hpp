@@ -1,17 +1,18 @@
 #pragma once
 #include "driver/mcpwm_prelude.h"
 #include "McpwmConfigs.hpp"
+#include "TimerPWM.hpp"
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-class MotorControlPWM{
+class MotorControlPWM : public TimerPWM{
 public:
     MotorControlPWM(const int pwmGpio, const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz, const uint32_t ticksPeriod );
     MotorControlPWM(const int pwmGpio);
-    void inline setPwmTicks(const uint32_t pwmTicks);
-    void inline setPwmCalibrated(const uint32_t pwm);
-    void toggleTimerGroup();//TODO add doc for specifying whats a timer group
-    void enableTimerGroup();
-    void disableTimerGroup();
+    void setPwmTicks(const uint32_t pwmTicks);
+    void setPwm(const uint32_t pwm) override;
+protected:
+    void enableTimer() override;
+    void disableTimer() override;
 private:
     void createComparatorAndGenerator();
     void createTimerAndOperator(const uint32_t timerResolutionHz,const uint32_t ticksPeriod, const mcpwm_timer_count_mode_t countMode);

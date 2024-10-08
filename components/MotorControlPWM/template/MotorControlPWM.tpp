@@ -71,28 +71,19 @@ void MotorControlPWM<clkSrc,groupeId>::setPwmTicks(const uint32_t pwmTicks)
     ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_, pwmTicks));
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupeId>
-void MotorControlPWM<clkSrc,groupeId>::setPwmCalibrated(const uint32_t pwm)
+void MotorControlPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
 {
     setPwmTicks(pwm / static_cast<float>(UINT32_MAX) * ticksThreshold_);
 }
 
 
 
-template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::toggleTimerGroup(){
-    if(groupIsEnabled_)
-        disableTimerGroup();
-    else
-        enableTimerGroup();
-}
-template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::enableTimerGroup(){
-    mcpwm_timer_enable(timer_);
-    groupIsEnabled_ = true;
 
+template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
+void MotorControlPWM<clkSrc,groupId>::enableTimer(){
+    mcpwm_timer_enable(timer_);
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-void MotorControlPWM<clkSrc,groupId>::disableTimerGroup(){
+void MotorControlPWM<clkSrc,groupId>::disableTimer(){
     mcpwm_timer_disable(timer_);
-    groupIsEnabled_ = false;
 }
