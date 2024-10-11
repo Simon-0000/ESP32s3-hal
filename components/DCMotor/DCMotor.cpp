@@ -10,8 +10,8 @@ DCMotor::DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise) :
     setSpeed(0);
 }
 
-void DCMotor::setSpeed(const int speed){
-    timer_->setPwm(static_cast<uint32_t>(abs(speed)));
+void DCMotor::setSpeed(const int32_t speed){
+    timer_->setPwm(static_cast<uint32_t>(abs(speed)<<1));
     directionPin_->setState(speed >= 0? direction_ : !direction_);
 }
 esp_err_t DCMotor::setSpeedDirection(bool direction){

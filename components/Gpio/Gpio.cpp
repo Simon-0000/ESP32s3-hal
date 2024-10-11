@@ -12,11 +12,11 @@ Gpio::Gpio(gpio_num_t gpioPin, const gpio_mode_t mode) : gpioPin_(gpioPin)
                mode == gpio_mode_t::GPIO_MODE_OUTPUT_OD;
                
     gpio_config_t config = {
-        1ULL << gpioPin,
-        mode,
-        GPIO_PULLUP_DISABLE,
-        GPIO_PULLDOWN_ENABLE,
-        GPIO_INTR_DISABLE
+        .pin_bit_mask = 1ULL << gpioPin,
+        .mode = mode,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
     };
     ESP_ERROR_CHECK(gpio_config(&config));
 }

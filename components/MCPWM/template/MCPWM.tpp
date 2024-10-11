@@ -13,11 +13,15 @@ MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio,const mcpwm_timer_count_mode_t co
 
     createTimerAndOperator(timerResolutionHz,ticksPeriod,countMode);
     createComparatorAndGenerator();
+    enableTimer();
+
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio): pwmGpio_(pwmGpio)
 {
     createComparatorAndGenerator();
+    enableTimer();
+
 }
 
 
@@ -32,16 +36,15 @@ void MCPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t timerResolutio
         .count_mode = countMode,
         .period_ticks = ticksPeriod,
         .intr_priority = 0,
-        .flags = {1,0}
+        .flags = {}
     };
+
     ESP_ERROR_CHECK(mcpwm_new_timer(&timerConfig, &timer_));
 
     if(operator_ == NULL)
     {
         mcpwm_operator_config_t operatorConfig = {
-            groupId,
-            0,
-            {}
+            .group_id = groupId,
         };    
         ESP_ERROR_CHECK(mcpwm_new_operator(&operatorConfig,&operator_));
     }
@@ -54,7 +57,6 @@ void MCPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 
 
     mcpwm_comparator_config_t comparatorConfig = {
-        .intr_priority = 0,
         .flags = {1,0,0}
     };
     // ESP_LOGI(TAG,"operator_ is :%d", static_cast<int>(operator_));
@@ -62,9 +64,12 @@ void MCPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 
     mcpwm_generator_config_t generatorConfig = {
         .gen_gpio_num = pwmGpio_,
-        .flags = {}
     };
     ESP_ERROR_CHECK(mcpwm_new_generator(operator_, &generatorConfig, &generator_));
+    ESP_ERROR_CHECK(mcpwm_generator_set_action_on_timer_event(generator_,
+            MCPWM_GEN_TIMER_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, MCPWM_TIMER_EVENT_EMPTY, MCPWM_GEN_ACTION_HIGH)));
+    ESP_ERROR_CHECK(mcpwm_generator_set_action_on_compare_event(generator_,
+        MCPWM_GEN_COMPARE_EVENT_ACTION(MCPWM_TIMER_DIRECTION_UP, comparator_, MCPWM_GEN_ACTION_LOW)));
 }
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupeId>
@@ -83,9 +88,11 @@ void MCPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 void MCPWM<clkSrc,groupId>::enableTimer(){
-    mcpwm_timer_enable(timer_);
+    ESP_ERROR_CHECK(mcpwm_timer_enable(timer_));
+    ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer_, MCPWM_TIMER_START_NO_STOP));
+
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 void MCPWM<clkSrc,groupId>::disableTimer(){
-    mcpwm_timer_disable(timer_);
+    ESP_ERROR_CHECK(mcpwm_timer_disable(timer_));
 }

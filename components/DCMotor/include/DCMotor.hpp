@@ -7,7 +7,7 @@
 class DCMotor{
 public:
     DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise);
-    void setSpeed(const int speed);
+    void setSpeed(const int32_t speed);
     esp_err_t setSpeedDirection(bool direction);
     void enable();
     void disable();

@@ -1,7 +1,11 @@
 #pragma once
 #include "TimerPWM.hpp"
-class LedPWM : public TimerPWM{
+#include "driver/ledc.h"
+
+template<ledc_timer_t timerSrc>
+class LedCPWM : public TimerPWM{
 public:
+    LedCPWM();
     void setPwm(const uint32_t pwm) override;
 
 protected:
@@ -12,4 +16,4 @@ private:
 
 };
 
-#include "LedPWM.tpp"
+#include "LedCPWM.tpp"
