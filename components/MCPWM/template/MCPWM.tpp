@@ -2,14 +2,12 @@
 #include "MCPWM.hpp"
 #include "esp_log.h"
 
-
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio,const mcpwm_timer_count_mode_t countMode, const uint32_t timerResolutionHz,const uint32_t ticksPeriod):
-    pwmGpio_(pwmGpio)
+    TimerPWM(timerResolutionHz), pwmGpio_(pwmGpio)
 {
-    ticksThreshold_ = ticksPeriod;
-    // // if(timer_ == NULL)
-    // //     ESP_LOGW(TAG, "Redifinition of timer (and operator) of clkSrc: %d, groupeId: %d",clkSrc,groupId);
+    if(timer_ == NULL)
+        ESP_LOGW("MCPWM", "Redifinition of timer (and operator) of clkSrc: %d, groupeId: %d",static_cast<int>(clkSrc),static_cast<int>(groupId));
 
     createTimerAndOperator(timerResolutionHz,ticksPeriod,countMode);
     createComparatorAndGenerator();
@@ -17,7 +15,7 @@ MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio,const mcpwm_timer_count_mode_t co
 
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
-MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio): pwmGpio_(pwmGpio)
+MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio) : pwmGpio_(pwmGpio)
 {
     createComparatorAndGenerator();
     enableTimer();
@@ -77,11 +75,7 @@ void MCPWM<clkSrc,groupeId>::setPwmTicks(const uint32_t pwmTicks)
 {
     ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_, pwmTicks));
 }
-template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupeId>
-void MCPWM<clkSrc,groupeId>::setPwm(const uint32_t pwm)
-{
-    setPwmTicks(pwm / static_cast<float>(UINT32_MAX) * ticksThreshold_);
-}
+
 
 
 

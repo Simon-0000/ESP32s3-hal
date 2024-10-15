@@ -4,6 +4,7 @@
 #include "Gpio.hpp"
 #include "DCMotor.hpp"
 #include "freertos/FreeRTOS.h"
+#include "LedCPWM.hpp"
 static const char* TAG_MAIN = "MAIN";
 
 
@@ -11,6 +12,7 @@ extern "C" void app_main(void)
 {
     ESP_LOGI(TAG_MAIN,"HELLOOO!");
     MCPWM<MCPWM_TIMER_CLK_SRC_DEFAULT,McpwmConfigs::TimerGroup::GROUP_0> mcPWM(0,mcpwm_timer_count_mode_t::MCPWM_TIMER_COUNT_MODE_UP,1000000,20000);
+    LedCPWM<ledc_timer_t::LEDC_TIMER_0> ledcPWM(ledc_channel_t::LEDC_CHANNEL_0, 1,ledc_timer_bit_t::LEDC_TIMER_10_BIT,1000000);
     Gpio directionPin(gpio_num_t::GPIO_NUM_8,gpio_mode_t::GPIO_MODE_OUTPUT);
     DCMotor motor(&mcPWM,&directionPin,true);
 
