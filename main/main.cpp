@@ -12,6 +12,8 @@ static const char* TAG_MAIN = "MAIN";
 extern "C" void app_main(void)
 {
     ESP_LOGI(TAG_MAIN,"HELLOOO!");
+    TestTask test;
+    test.start();
     
     //Motor Tests
     MCPWM<MCPWM_TIMER_CLK_SRC_DEFAULT,McpwmConfigs::TimerGroup::GROUP_0> mcPWM(0,mcpwm_timer_count_mode_t::MCPWM_TIMER_COUNT_MODE_UP,10000,20000);

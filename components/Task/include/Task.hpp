@@ -4,8 +4,8 @@
 
 
 
-
-template <std::size_t NStackSize = configMINIMAL_STACK_SIZE>
+static const size_t ONE_KIBIBYTE = 1024;
+template <size_t NStackSize = 5*ONE_KIBIBYTE>
 class Task{
 public:
     enum CoreId {PROTOCOL_CPU = 0, APP_CPU = 1, AUTOMATIC_CPU = tskNO_AFFINITY};
@@ -25,7 +25,7 @@ public:
     void start();
 
 private: 
-    void run(nullptr_t);
+	static void runTask(void* pvParameters);
 
     const char* const name_;
     const UBaseType_t priority_;
@@ -43,3 +43,6 @@ private:
     constexpr static uint32_t DEFAULT_PRIORITY = configMAX_PRIORITIES / 2;
 
 };
+
+#include "../template/Task.tpp"
+

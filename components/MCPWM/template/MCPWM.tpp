@@ -40,6 +40,8 @@ void MCPWM<clkSrc,groupId>::createTimerAndOperator(const uint32_t timerResolutio
     {
         mcpwm_operator_config_t operatorConfig = {
             .group_id = groupId,
+            .intr_priority = {},
+            .flags = {}
         };    
         ESP_ERROR_CHECK(mcpwm_new_operator(&operatorConfig,&operator_));
     }
@@ -52,6 +54,7 @@ void MCPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 
 
     mcpwm_comparator_config_t comparatorConfig = {
+        .intr_priority{},
         .flags = {1,0,0}
     };
     // ESP_LOGI(TAG,"operator_ is :%d", static_cast<int>(operator_));
@@ -59,6 +62,7 @@ void MCPWM<clkSrc,groupId>::createComparatorAndGenerator(){
 
     mcpwm_generator_config_t generatorConfig = {
         .gen_gpio_num = pwmGpio_,
+        .flags = {}
     };
     ESP_ERROR_CHECK(mcpwm_new_generator(operator_, &generatorConfig, &generator_));
     ESP_ERROR_CHECK(mcpwm_generator_set_action_on_timer_event(generator_,

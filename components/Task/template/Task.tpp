@@ -3,7 +3,7 @@
 
 static const char* TAG = "TASK";
 
-template <std::size_t NStackSize>
+template <size_t NStackSize>
 void Task<NStackSize>::suspend(){
     if(status == TaskStatus::SUSPENDED)
         ESP_LOGW(TAG, "Task was already suspended");
@@ -14,7 +14,7 @@ void Task<NStackSize>::suspend(){
     }
 }
 
-template <std::size_t NStackSize>
+template <size_t NStackSize>
 void Task<NStackSize>::stop(){
     if(status == TaskStatus::STOPPED)
         ESP_LOGW(TAG, "Task was already stopped");
@@ -26,7 +26,7 @@ void Task<NStackSize>::stop(){
     }
 }
 
-template <std::size_t NStackSize>
+template <size_t NStackSize>
 void Task<NStackSize>::start(){
     switch (status)
     {
@@ -38,16 +38,20 @@ void Task<NStackSize>::start(){
             vTaskResume(handle_);
             break;
         case TaskStatus::STOPPED:
-            onInit();
             status = TaskStatus::STARTED;
-            handle_ = xTaskCreateStaticPinnedToCore(run, name_, NStackSize, nullptr, priority_, stack_.data(), &taskBuffer_, coreId_);
+            handle_ = xTaskCreateStaticPinnedToCore(runTask, name_, NStackSize, (void*)this, priority_, stack_.data(), &taskBuffer_, coreId_);
             break;
     }
 
 }
-
-template<std::size_t NStackSize>
-void Task<NStackSize>::run() {
-    run();
-    stop();
+template <size_t NStackSize>
+void Task<NStackSize>::runTask(void* pvParameters) {            
+    // ((Task<NStackSize>*)pvParameters)->onInit();
+    static_cast<Task<NStackSize>*>(pvParameters)->run(); 
 }
+
+// template<std::size_t NStackSize>
+// void Task<NStackSize>::run(void*) {
+//     run();
+//     stop();
+// }

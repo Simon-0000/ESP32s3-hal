@@ -22,7 +22,6 @@ RUN groupadd --gid $USER_GID $CONTAINER_USER \
 
 
 RUN chmod -R 775 /opt/esp/python_env/
-# RUN chown :${CONTAINER_USER} /dev/ttyUSB0
 
 USER ${CONTAINER_USER}
 ENV USER=${CONTAINER_USER}

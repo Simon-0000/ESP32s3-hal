@@ -3,6 +3,7 @@
 
 class TestTask : public Task<>{
 public:
+    TestTask() : Task("test"){}
     void run() override;
     void onInit() override;
     void onStop() override;
