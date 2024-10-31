@@ -8,7 +8,6 @@ DCMotor::DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise) :
     
     ESP_ERROR_CHECK(configureDirection(direction_));
     setSpeed(0);
-    enable();
 }
 
 void DCMotor::setSpeed(const int32_t speed){

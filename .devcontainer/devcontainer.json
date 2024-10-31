@@ -18,7 +18,12 @@
                 "ms-vscode.cpptools",
                 "visualstudioexptteam.vscodeintellicode",
 
-			]
+			],
+            "mounts": [
+                "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
+                "source=/dev,target=/dev,type=bind",
+                "source=/etc/udev/rules.d,target=/etc/udev/rules.d,type=bind"
+            ]
 		}
 	},
 

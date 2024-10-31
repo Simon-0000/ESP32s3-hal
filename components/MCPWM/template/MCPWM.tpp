@@ -11,15 +11,12 @@ MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio,const mcpwm_timer_count_mode_t co
 
     createTimerAndOperator(timerResolutionHz,ticksPeriod,countMode);
     createComparatorAndGenerator();
-    enableTimer();
 
 }
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 MCPWM<clkSrc,groupId>::MCPWM(const int pwmGpio) : pwmGpio_(pwmGpio)
 {
     createComparatorAndGenerator();
-    enableTimer();
-
 }
 
 
@@ -82,6 +79,7 @@ void MCPWM<clkSrc,groupeId>::setPwmTicks(const uint32_t pwmTicks)
 
 template<mcpwm_timer_clock_source_t clkSrc, uint32_t groupId>
 void MCPWM<clkSrc,groupId>::enableTimer(){
+    ESP_LOGI("MCPWM", "ENABLE TIMER");
     ESP_ERROR_CHECK(mcpwm_timer_enable(timer_));
     ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer_, MCPWM_TIMER_START_NO_STOP));
 
