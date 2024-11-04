@@ -4,6 +4,28 @@
 static const char* TAG = "TASK";
 
 template <size_t NStackSize>
+void Task<NStackSize>::setStatus(const TaskStatus& status){
+    switch(status)
+    {
+        case TaskStatus::STARTED:
+            start();
+            break;
+        case TaskStatus::STOPPED:
+            stop();
+            break;
+        case TaskStatus::SUSPENDED:
+            suspend();
+            break;
+    }
+}
+
+template <size_t NStackSize>
+TaskStatus Task<NStackSize>::getStatus(){
+    return status;
+}
+
+
+template <size_t NStackSize>
 void Task<NStackSize>::suspend(){
     if(status == TaskStatus::SUSPENDED)
         ESP_LOGW(TAG, "Task was already suspended");
@@ -20,9 +42,9 @@ void Task<NStackSize>::stop(){
         ESP_LOGW(TAG, "Task was already stopped");
     else
     {
+        status = TaskStatus::STOPPED;
         vTaskDelete(handle_);
         onStop();
-        status = TaskStatus::STOPPED;
     }
 }
 
@@ -39,19 +61,22 @@ void Task<NStackSize>::start(){
             break;
         case TaskStatus::STOPPED:
             status = TaskStatus::STARTED;
+            onInit();
             handle_ = xTaskCreateStaticPinnedToCore(runTask, name_, NStackSize, (void*)this, priority_, stack_.data(), &taskBuffer_, coreId_);
             break;
     }
 
 }
+
+template<size_t NStackSize>
+void Task<NStackSize>::bindLocally(Chainable* parent) {
+    if (Task<NStackSize>* parentTask = dynamic_cast<Task<NStackSize>*>(parent))
+        setStatus(parentTask->getStatus());
+}
+
+
 template <size_t NStackSize>
 void Task<NStackSize>::runTask(void* pvParameters) {            
-    // ((Task<NStackSize>*)pvParameters)->onInit();
     static_cast<Task<NStackSize>*>(pvParameters)->run(); 
 }
 
-// template<std::size_t NStackSize>
-// void Task<NStackSize>::run(void*) {
-//     run();
-//     stop();
-// }

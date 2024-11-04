@@ -1,12 +1,16 @@
 #pragma once
 #include "freertos/FreeRTOS.h"
+#include "Chainable.hpp"
 #include <array>
 
 
 
 static const size_t ONE_KIBIBYTE = 1024;
+enum class TaskStatus {STARTED, STOPPED, SUSPENDED};
+
+
 template <size_t NStackSize = 5*ONE_KIBIBYTE>
-class Task{
+class Task : public Chainable{
 public:
     enum CoreId {PROTOCOL_CPU = 0, APP_CPU = 1, AUTOMATIC_CPU = tskNO_AFFINITY};
 
@@ -20,10 +24,13 @@ public:
     virtual void onSuspend() {}
     virtual void onResume() {}
 
+    void setStatus(const TaskStatus& status);
+    TaskStatus getStatus();
     void suspend();
     void stop();
     void start();
-
+    
+    void bindLocally(Chainable* parent) override;
 private: 
 	static void runTask(void* pvParameters);
 
@@ -31,7 +38,6 @@ private:
     const UBaseType_t priority_;
     const CoreId coreId_;
 
-    enum class TaskStatus {STARTED, STOPPED, SUSPENDED};
     TaskStatus status = TaskStatus::STOPPED;
 
 
