@@ -1,5 +1,5 @@
 
-idf_component_register(.
+idf_component_register(SRCS "Task.cpp"
                     INCLUDE_DIRS "include"
                     REQUIRES freertos Chainable)
                     

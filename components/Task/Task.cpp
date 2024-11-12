@@ -3,8 +3,7 @@
 
 static const char* TAG = "TASK";
 
-template <size_t NStackSize>
-void Task<NStackSize>::setStatus(const TaskStatus& status){
+void Task::setStatus(const TaskStatus& status){
     switch(status)
     {
         case TaskStatus::STARTED:
@@ -19,14 +18,12 @@ void Task<NStackSize>::setStatus(const TaskStatus& status){
     }
 }
 
-template <size_t NStackSize>
-TaskStatus Task<NStackSize>::getStatus(){
+TaskStatus Task::getStatus(){
     return status;
 }
 
 
-template <size_t NStackSize>
-void Task<NStackSize>::suspend(){
+void Task::suspend(){
     if(status == TaskStatus::SUSPENDED)
         ESP_LOGW(TAG, "Task was already suspended");
     else if(status == TaskStatus::STARTED){
@@ -36,8 +33,7 @@ void Task<NStackSize>::suspend(){
     }
 }
 
-template <size_t NStackSize>
-void Task<NStackSize>::stop(){
+void Task::stop(){
     if(status == TaskStatus::STOPPED)
         ESP_LOGW(TAG, "Task was already stopped");
     else
@@ -48,8 +44,7 @@ void Task<NStackSize>::stop(){
     }
 }
 
-template <size_t NStackSize>
-void Task<NStackSize>::start(){
+void Task::start(){
     switch (status)
     {
         case TaskStatus::STARTED:
@@ -62,21 +57,19 @@ void Task<NStackSize>::start(){
         case TaskStatus::STOPPED:
             status = TaskStatus::STARTED;
             onInit();
-            handle_ = xTaskCreateStaticPinnedToCore(runTask, name_, NStackSize, (void*)this, priority_, stack_.data(), &taskBuffer_, coreId_);
+            xTaskCreatePinnedToCore(runTask, name_, stackSize_, (void*)this, priority_, &handle_, coreId_);
             break;
     }
 
 }
 
-template<size_t NStackSize>
-void Task<NStackSize>::bindLocally(Chainable* parent) {
-    if (Task<NStackSize>* parentTask = dynamic_cast<Task<NStackSize>*>(parent))
+void Task::bindLocally(Chainable* parent) {
+    if (Task* parentTask = dynamic_cast<Task*>(parent))
         setStatus(parentTask->getStatus());
 }
 
 
-template <size_t NStackSize>
-void Task<NStackSize>::runTask(void* pvParameters) {            
-    static_cast<Task<NStackSize>*>(pvParameters)->run(); 
+void Task::runTask(void* pvParameters) {            
+    static_cast<Task*>(pvParameters)->run(); 
 }
 

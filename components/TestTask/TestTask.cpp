@@ -9,14 +9,14 @@ void TestTask::run() {
 }
 
 void TestTask::onInit(){
-    ESP_LOGI("TEST TASK", "INIT");
+    // ESP_LOGI("TEST TASK", "INIT");
 }
 void TestTask::onResume(){
-    ESP_LOGI("TEST TASK", "RESUME");
+    // ESP_LOGI("TEST TASK", "RESUME");
 }
 void TestTask::onStop(){
-    ESP_LOGI("TEST TASK", "STOP");
+    // ESP_LOGI("TEST TASK", "STOP");
 }
 void TestTask::onSuspend(){
-    ESP_LOGI("TEST TASK", "SUSPEND");
+    // ESP_LOGI("TEST TASK", "SUSPEND");
 }

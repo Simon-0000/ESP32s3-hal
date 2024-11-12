@@ -1,7 +1,7 @@
 #pragma once
 #include "Task.hpp"
 
-class TestTask : public Task<>{
+class TestTask : public Task{
 public:
     TestTask() : Task("test"){}
     void run() override;
