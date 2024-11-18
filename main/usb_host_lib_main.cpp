@@ -10,7 +10,8 @@
 #include "esp_log.h"
 #include "esp_intr_alloc.h"
 #include "usb/usb_host.h"
-#include "UsbHost.hpp"
+#include "UsbDaemon.hpp"
+#include "UsbClient.hpp"
 
 #define DAEMON_TASK_PRIORITY    2
 #define CLASS_TASK_PRIORITY     3
@@ -60,9 +61,7 @@ static void host_lib_daemon_task(void *arg)
     usb_host_config_t host_config = {
         .skip_phy_setup = false,
         .intr_flags = ESP_INTR_FLAG_LEVEL1,
-#ifdef ENABLE_ENUM_FILTER_CALLBACK
-        .enum_filter_cb = set_config_cb,
-#endif // ENABLE_ENUM_FILTER_CALLBACK
+        .enum_filter_cb = NULL
     };
     ESP_ERROR_CHECK(usb_host_install(&host_config));
 
@@ -95,8 +94,18 @@ extern "C" void app_main(void)
 {
 
     //TESTING CODE
-    UsbHost customHost();
+    UsbDaemon customHost;
+    UsbClient client;
+    customHost.linkClient(client);
+    customHost.start();
+    vTaskDelay(1000/portTICK_PERIOD_MS);
+    client.start();
+    while(true){
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+
+    }
     //GIVEN CODE
+    /*
     SemaphoreHandle_t signaling_sem = xSemaphoreCreateBinary();
 
     TaskHandle_t daemon_task_hdl;
@@ -128,4 +137,5 @@ extern "C" void app_main(void)
     //Delete the tasks
     vTaskDelete(class_driver_task_hdl);
     vTaskDelete(daemon_task_hdl);
+    */
 }
