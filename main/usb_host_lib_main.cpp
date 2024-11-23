@@ -12,6 +12,7 @@
 #include "usb/usb_host.h"
 #include "UsbDaemon.hpp"
 #include "UsbClient.hpp"
+#include "Controller.hpp"
 
 // #define DAEMON_TASK_PRIORITY    2
 // #define CLASS_TASK_PRIORITY     3
@@ -95,10 +96,12 @@ extern "C" void app_main(void)
 
     //TESTING CODE
     UsbDaemon customHost;
-    UsbClient client;
+    Controller controller;
+    UsbClient client(&controller);
+    
     customHost.linkClient(client);
     customHost.start();
-    // vTaskDelay(1000/portTICK_PERIOD_MS);
+    vTaskDelay(1000/portTICK_PERIOD_MS);
     client.start();
     while(true){
         vTaskDelay(1000/portTICK_PERIOD_MS);

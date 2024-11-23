@@ -28,16 +28,14 @@ static void client_event_cb(const usb_host_client_event_msg_t *event_msg, void *
             ESP_LOGI(TAG, "\t%s speed", (dev_info.speed == USB_SPEED_LOW) ? "Low" : "Full");
             ESP_LOGI(TAG, "\tbConfigurationValue %d", dev_info.bConfigurationValue);
 
-            // driver_obj->actions |= ACTION_OPEN_DEV;
             driver_obj->event = USB_EVENTS::ON_DEVICE_INIT;
         }
         break;
     case USB_HOST_CLIENT_EVENT_DEV_GONE:
         if (driver_obj->dev_hdl != NULL) {
             //Cancel any other actions and close the device next
-            // driver_obj->actions = ACTION_CLOSE_DEV;
             ESP_LOGI(TAG, "CLOSING DEVICE");
-
+            //TODO call device.stop before closing
             ESP_ERROR_CHECK(usb_host_device_close(driver_obj->client_hdl, driver_obj->dev_hdl));
             driver_obj->dev_hdl = NULL;
             driver_obj->event = USB_EVENTS::ON_DEVICE_STOP;
@@ -72,22 +70,19 @@ void UsbClient::run()
         switch(driver_.event)
         {
             case USB_EVENTS::ON_DEVICE_INIT:
-                onDeviceInit();
-                driver_.event = USB_EVENTS::ON_DEVICE_RUN;
+                driver_.event = USB_EVENTS::NONE;
+                device_->start();
+                ESP_LOGI(TAG, "done init");
                 break;
             case USB_EVENTS::ON_DEVICE_STOP:
-                onDeviceStop();
                 driver_.event = USB_EVENTS::NONE;
+                device_->stop();
+                ESP_LOGI(TAG, "done stop");
                 break;           
-            case USB_EVENTS::ON_DEVICE_RUN:
-                onDeviceRun();
-                break;
-            case USB_EVENTS::NONE:
-                //no device is connected
+            default:
                 break;
         }
     }
-
 }
 
 
