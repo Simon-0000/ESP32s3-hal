@@ -1,20 +1,57 @@
 #include "Controller.hpp"
 #include "esp_log.h"
-#include <string.h>
+#include <cstring>
 
 
 static void printInput(usb_transfer_t* transfer){
     char log_buffer[512]; // Adjust size as needed based on expected transfer sizes
     int pos = 0;
+    Controller* controller = static_cast<Controller*>(transfer->context);
+    memcpy(controller->getBuffer(),transfer->data_buffer,Controller::BUFFER_SIZE);
+    printf("\033[H\033[J");
 
+    
     pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Transferred bytes: ");
 
     for (int i = 0; i < transfer->actual_num_bytes && pos < sizeof(log_buffer) - 4; i++) {
-        pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "0x%02X ", transfer->data_buffer[i]);
+        pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "0x%02X ", controller->getBuffer()[i]);
     }
 
-    ESP_LOGI("CONTROLLER", "Transfer status: %d, actual number of bytes transferred: %d\n%s",
+    printf("Transfer status: %d, actual number of bytes transferred: %d\n%s",
             transfer->status, transfer->actual_num_bytes, log_buffer);
+    pos = 0;
+
+    //CHATGPT CODE to print 
+    // Printing button values
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "\nButtons: ");
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "A: %d, ", controller->getButtonA());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "B: %d, ", controller->getButtonB());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "X: %d, ", controller->getButtonX());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Y: %d, ", controller->getButtonY());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Left: %d, ", controller->getLeftButton());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Right: %d, ", controller->getRightButton());
+    
+    // Printing axis buttons
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "\nAxis Buttons: ");
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Up: %d, ", controller->getAxisButtonUp());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Down: %d, ", controller->getAxisButtonDown());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Left: %d, ", controller->getAxisButtonLeft());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Right: %d, ", controller->getAxisButtonRight());
+    
+    // Printing joystick axis values
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "\nJoysticks: ");
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Left X: %d, ", controller->getLeftAxisX());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Left Y: %d, ", controller->getLeftAxisY());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Right X: %d, ", controller->getRightAxisX());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Right Y: %d, ", controller->getRightAxisY());
+
+    // Printing triggers
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "\nTriggers: ");
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Left: %d, ", controller->getLeftTrigger());
+    pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Right: %d", controller->getRightTrigger());
+
+    // Print the updated log to the terminal
+    printf("%s\n", log_buffer);
 
 }
 
@@ -40,4 +77,59 @@ void Controller::run(){
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
 }
-        
+
+//ABYX buttons
+bool Controller::getButtonA() const {
+    return static_cast<bool>(buffer_[3] & 0x10);
+}
+bool Controller::getButtonB() const {
+    return static_cast<bool>(buffer_[3] & 0x20);
+}
+bool Controller::getButtonY() const {
+    return static_cast<bool>(buffer_[3] & 0x80);
+}
+bool Controller::getButtonX() const {
+    return static_cast<bool>(buffer_[3] & 0x40);
+}
+
+//Axis buttons
+bool Controller::getAxisButtonUp() const {
+    return static_cast<bool>(buffer_[2] & 0x01);
+}
+bool Controller::getAxisButtonDown() const {
+    return static_cast<bool>(buffer_[2] & 0x02);
+}
+bool Controller::getAxisButtonLeft() const {
+    return static_cast<bool>(buffer_[2] & 0x04);
+}
+bool Controller::getAxisButtonRight() const {
+    return static_cast<bool>(buffer_[2] & 0x08);
+}
+
+//L/R buttons
+bool Controller::getLeftButton() const {
+    return static_cast<bool>(buffer_[3] & 0x01);
+}
+bool Controller::getRightButton() const {
+    return static_cast<bool>(buffer_[3] & 0x02);
+}
+
+//Left joystick
+int8_t Controller::getLeftAxisX() const {
+    return static_cast<int8_t>(buffer_[7]);
+}
+int8_t Controller::getLeftAxisY() const {
+    return static_cast<int8_t>(buffer_[9]);
+}
+int8_t Controller::getRightAxisX() const {
+    return static_cast<int8_t>(buffer_[11]);//done
+}
+int8_t Controller::getRightAxisY() const {
+    return static_cast<int8_t>(buffer_[13]);
+}
+uint8_t Controller::getLeftTrigger() const {
+    return buffer_[4];
+}
+uint8_t Controller::getRightTrigger() const {
+    return buffer_[5];
+}
