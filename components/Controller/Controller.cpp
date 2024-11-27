@@ -7,14 +7,15 @@ static void printInput(usb_transfer_t* transfer){
     char log_buffer[512]; // Adjust size as needed based on expected transfer sizes
     int pos = 0;
     Controller* controller = static_cast<Controller*>(transfer->context);
-    memcpy(controller->getBuffer(),transfer->data_buffer,Controller::BUFFER_SIZE);
+    {
+        const auto lock = controller->createLock();
+        memcpy(controller->buffer_,transfer->data_buffer,Controller::BUFFER_SIZE);
+    }
     printf("\033[H\033[J");
-
-    
     pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "Transferred bytes: ");
 
     for (int i = 0; i < transfer->actual_num_bytes && pos < sizeof(log_buffer) - 4; i++) {
-        pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "0x%02X ", controller->getBuffer()[i]);
+        pos += snprintf(log_buffer + pos, sizeof(log_buffer) - pos, "0x%02X ", controller->buffer_[i]);
     }
 
     printf("Transfer status: %d, actual number of bytes transferred: %d\n%s",
@@ -60,13 +61,12 @@ void Controller::onInit(){
     usb_host_interface_claim( driver_->client_hdl, driver_->dev_hdl, 0, 0);
 }
 void Controller::run(){
+
     ESP_LOGI("CONTROLLER", "run:");
-    uint8_t buffer[32]; // Max packet size
     usb_transfer_t *transfer_in ;
     usb_host_transfer_alloc(1024, 0, &transfer_in);
     memset(transfer_in->data_buffer, 0xAA, 1024);
-    // transfer_in->data_buffer_size = sizeof(buffer);
-    transfer_in->num_bytes = sizeof(buffer);
+    transfer_in->num_bytes = sizeof(buffer_);
     transfer_in->device_handle = driver_->dev_hdl;
     transfer_in->bEndpointAddress = 0x81;
     transfer_in->callback = printInput;
@@ -80,56 +80,77 @@ void Controller::run(){
 
 //ABYX buttons
 bool Controller::getButtonA() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x10);
 }
 bool Controller::getButtonB() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x20);
 }
 bool Controller::getButtonY() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x80);
 }
 bool Controller::getButtonX() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x40);
 }
 
 //Axis buttons
 bool Controller::getAxisButtonUp() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[2] & 0x01);
 }
 bool Controller::getAxisButtonDown() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[2] & 0x02);
 }
 bool Controller::getAxisButtonLeft() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[2] & 0x04);
 }
 bool Controller::getAxisButtonRight() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[2] & 0x08);
 }
 
 //L/R buttons
 bool Controller::getLeftButton() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x01);
 }
 bool Controller::getRightButton() const {
+    const auto lock = createLock();
     return static_cast<bool>(buffer_[3] & 0x02);
 }
 
 //Left joystick
 int8_t Controller::getLeftAxisX() const {
+    const auto lock = createLock();
     return static_cast<int8_t>(buffer_[7]);
 }
 int8_t Controller::getLeftAxisY() const {
+    const auto lock = createLock();
     return static_cast<int8_t>(buffer_[9]);
 }
 int8_t Controller::getRightAxisX() const {
+    const auto lock = createLock();
     return static_cast<int8_t>(buffer_[11]);//done
 }
 int8_t Controller::getRightAxisY() const {
+    const auto lock = createLock();
     return static_cast<int8_t>(buffer_[13]);
 }
 uint8_t Controller::getLeftTrigger() const {
+    const auto lock = createLock();
     return buffer_[4];
 }
 uint8_t Controller::getRightTrigger() const {
+    const auto lock = createLock();
     return buffer_[5];
 }
+
+const std::scoped_lock<std::mutex> Controller::createLock() const{
+    return std::scoped_lock<std::mutex>(bufferMutex_);
+}
+

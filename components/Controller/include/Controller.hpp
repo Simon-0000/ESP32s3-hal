@@ -1,5 +1,11 @@
 #pragma once
 #include "UsbDevice.hpp"
+#include <mutex>
+
+
+class Controller;
+static void printInput(usb_transfer_t* transfer);
+
 class Controller : public UsbDevice {
 public: 
     Controller() : UsbDevice("Controller") {}
@@ -25,8 +31,11 @@ public:
 	uint8_t getLeftTrigger() const;
 	uint8_t getRightTrigger() const;
 
-    uint8_t* getBuffer() {return buffer_;}
     static constexpr size_t BUFFER_SIZE = 32;
+    friend void printInput(usb_transfer_t* transfer);
 private:
+    inline const std::scoped_lock<std::mutex> createLock() const;
     uint8_t buffer_[32];
+    mutable std::mutex bufferMutex_;
 };
+
