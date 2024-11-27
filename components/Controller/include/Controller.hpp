@@ -12,6 +12,8 @@ public:
 
     void run() override;
     void onInit() override;
+    void onStop() override;
+
 
 	bool getButtonA() const;
 	bool getButtonB() const;
@@ -37,5 +39,7 @@ private:
     inline const std::scoped_lock<std::mutex> createLock() const;
     uint8_t buffer_[32];
     mutable std::mutex bufferMutex_;
+
+    static constexpr uint8_t INTERFACE_NUMBER = 0;
 };
 

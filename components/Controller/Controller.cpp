@@ -4,6 +4,8 @@
 
 
 static void printInput(usb_transfer_t* transfer){
+    if(transfer->actual_num_bytes == 0)
+        return;
     char log_buffer[512]; // Adjust size as needed based on expected transfer sizes
     int pos = 0;
     Controller* controller = static_cast<Controller*>(transfer->context);
@@ -58,15 +60,20 @@ static void printInput(usb_transfer_t* transfer){
 
 void Controller::onInit(){
     ESP_LOGI("CONTROLLER", "init:");
-    usb_host_interface_claim( driver_->client_hdl, driver_->dev_hdl, 0, 0);
+    usb_host_interface_claim( driver_->client_hdl, driver_->dev_hdl, INTERFACE_NUMBER,INTERFACE_NUMBER);
 }
+void Controller::onStop(){
+    ESP_LOGI("CONTROLLER", "stop:");
+    usb_host_interface_release( driver_->client_hdl, driver_->dev_hdl, INTERFACE_NUMBER);
+}
+
 void Controller::run(){
 
     ESP_LOGI("CONTROLLER", "run:");
     usb_transfer_t *transfer_in ;
-    usb_host_transfer_alloc(1024, 0, &transfer_in);
-    memset(transfer_in->data_buffer, 0xAA, 1024);
-    transfer_in->num_bytes = sizeof(buffer_);
+    usb_host_transfer_alloc(32, 0, &transfer_in);
+    memset(transfer_in->data_buffer, 0xAA, 32);
+    transfer_in->num_bytes = 32;
     transfer_in->device_handle = driver_->dev_hdl;
     transfer_in->bEndpointAddress = 0x81;
     transfer_in->callback = printInput;
@@ -74,7 +81,7 @@ void Controller::run(){
 
     while(true){
         usb_host_transfer_submit(transfer_in);
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(10/portTICK_PERIOD_MS);
     }
 }
 

@@ -36,8 +36,6 @@ static void client_event_cb(const usb_host_client_event_msg_t *event_msg, void *
             //Cancel any other actions and close the device next
             ESP_LOGI(TAG, "CLOSING DEVICE");
             //TODO call device.stop before closing
-            ESP_ERROR_CHECK(usb_host_device_close(driver_obj->client_hdl, driver_obj->dev_hdl));
-            driver_obj->dev_hdl = NULL;
             driver_obj->event = USB_EVENTS::ON_DEVICE_STOP;
         }
         break;
@@ -77,6 +75,8 @@ void UsbClient::run()
             case USB_EVENTS::ON_DEVICE_STOP:
                 driver_.event = USB_EVENTS::NONE;
                 device_->stop();
+                ESP_ERROR_CHECK(usb_host_device_close(driver_.client_hdl, driver_.dev_hdl));
+                driver_.dev_hdl = NULL;
                 ESP_LOGI(TAG, "done stop");
                 break;           
             default:
