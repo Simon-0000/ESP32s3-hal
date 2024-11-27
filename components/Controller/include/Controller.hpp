@@ -26,10 +26,10 @@ public:
 
 	bool getLeftButton() const;
 	bool getRightButton() const;
-	int8_t getLeftAxisX() const;
-	int8_t getLeftAxisY() const;
-	int8_t getRightAxisX() const;
-	int8_t getRightAxisY() const;
+	int16_t getLeftAxisX() const;
+	int16_t getLeftAxisY() const;
+	int16_t getRightAxisX() const;
+	int16_t getRightAxisY() const;
 	uint8_t getLeftTrigger() const;
 	uint8_t getRightTrigger() const;
 
@@ -41,5 +41,7 @@ private:
     mutable std::mutex bufferMutex_;
 
     static constexpr uint8_t INTERFACE_NUMBER = 0;
+    static constexpr uint16_t STICK_DRIFT = 1000;
+
 };
 

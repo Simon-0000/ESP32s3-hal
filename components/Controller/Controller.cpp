@@ -132,21 +132,25 @@ bool Controller::getRightButton() const {
 }
 
 //Left joystick
-int8_t Controller::getLeftAxisX() const {
+int16_t Controller::getLeftAxisX() const {
     const auto lock = createLock();
-    return static_cast<int8_t>(buffer_[7]);
+    int16_t value = buffer_[7] << 8 | buffer_[6];
+    return value < STICK_DRIFT && -value < STICK_DRIFT ? 0 : value;
 }
-int8_t Controller::getLeftAxisY() const {
+int16_t Controller::getLeftAxisY() const {
     const auto lock = createLock();
-    return static_cast<int8_t>(buffer_[9]);
+    int16_t value = buffer_[9] << 8 | buffer_[8];
+    return value < STICK_DRIFT && -value < STICK_DRIFT ? 0 : value;
 }
-int8_t Controller::getRightAxisX() const {
+int16_t Controller::getRightAxisX() const {
     const auto lock = createLock();
-    return static_cast<int8_t>(buffer_[11]);//done
+    int16_t value = buffer_[11] << 8 | buffer_[10];
+    return value < STICK_DRIFT && -value < STICK_DRIFT ? 0 : value;
 }
-int8_t Controller::getRightAxisY() const {
+int16_t Controller::getRightAxisY() const {
     const auto lock = createLock();
-    return static_cast<int8_t>(buffer_[13]);
+    int16_t value = buffer_[11] << 8 | buffer_[10];
+    return value < STICK_DRIFT && -value < STICK_DRIFT ? 0 : value;
 }
 uint8_t Controller::getLeftTrigger() const {
     const auto lock = createLock();
