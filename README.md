@@ -1,5 +1,5 @@
-# ESP-PM 2025 Overview
-Project for the boat that is required in the 2025 jeu de genie
+# ESP-PM 2025 Overview (incomplete code)
+Project for the boat that is required in the 2025 jeu de genie. <b>NOTE THAT THIS ISNT THE FULL CODE AND DOESNT CONTAIN THE "Bateau2025" COMPONENT</b>
 
 ## Description
 The code is designed to receive inputs from a controller in order to control a boat's rudder and propeller. The onboard addressable led is used to show the state of the controller connection:
