@@ -1,71 +1,43 @@
 #include "Task.hpp"
 #include "esp_log.h"
 
-static const char* TAG = "TASK";
-
-void Task::setStatus(const TaskStatus& status){
-    switch(status)
-    {
-        case TaskStatus::STARTED:
-            start();
-            break;
-        case TaskStatus::STOPPED:
-            stop();
-            break;
-        case TaskStatus::SUSPENDED:
-            suspend();
-            break;
-    }
-}
-
-TaskStatus Task::getStatus(){
-    return status;
-}
-
-
-void Task::suspend(){
-    if(status == TaskStatus::SUSPENDED)
-        ESP_LOGW(TAG, "Task was already suspended");
-    else if(status == TaskStatus::STARTED){
+esp_err_t Task::suspend(){
+    if(isSuspended_)
+        return ESP_ERR_INVALID_STATE;
+    else {
         vTaskSuspend(handle_);
         onSuspend();
-        status = TaskStatus::SUSPENDED;
+        isSuspended_ = true;
+        return ESP_OK;
     }
 }
 
-void Task::stop(){
-    if(status == TaskStatus::STOPPED)
-        ESP_LOGW(TAG, "Task was already stopped");
-    else
-    {
-        status = TaskStatus::STOPPED;
-        vTaskDelete(handle_);
-        onStop();
-    }
+
+esp_err_t Task::disableOnce(){
+    isSuspended_ = false;
+    vTaskDelete(handle_);
+    onStop();
+    return ESP_OK;
 }
 
-void Task::start(){
-    switch (status)
-    {
-        case TaskStatus::STARTED:
-            ESP_LOGW(TAG, "Task was already started");
-            break;
-        case TaskStatus::SUSPENDED:
-            onResume();
-            vTaskResume(handle_);
-            break;
-        case TaskStatus::STOPPED:
-            status = TaskStatus::STARTED;
-            onInit();
-            xTaskCreatePinnedToCore(runTask, name_, stackSize_, (void*)this, priority_, &handle_, coreId_);
-            break;
+esp_err_t Task::enableOnce(){
+    if(isSuspended_){
+        isSuspended_ = false;
+        onResume();
+        vTaskResume(handle_);
+        return ESP_OK;
+    }else{
+        onInit();
+        return xTaskCreatePinnedToCore(runTask, name_, stackSize_, (void*)this, priority_, &handle_, coreId_);
     }
-
+    
 }
 
-void Task::bindLocally(Chainable* parent) {
-    if (Task* parentTask = dynamic_cast<Task*>(parent))
-        setStatus(parentTask->getStatus());
+void Task::syncSelf() {
+    EnableableSmart::syncSelf();
+    if (Task* parentTask = dynamic_cast<Task*>(parent_))
+        if(parentTask->isSuspended_)
+            suspend();
 }
 
 

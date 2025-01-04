@@ -6,4 +6,4 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(ESP32s3-hal)
+project(esp-pm)

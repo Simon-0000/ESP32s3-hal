@@ -1,25 +1,15 @@
 #pragma once
-#include "TimerPWM.hpp"
-#include "Gpio.hpp"
-#include "Chainable.hpp"
+#include "Motor.hpp"
 #include <cstdlib>
 
 
-class DCMotor : public Chainable{
+class DCMotor : public Motor{
 public:
-    DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise);
-    void setSpeed(const int32_t speed);
+    DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise = true);
+    void setSpeed(const int16_t speed);
     esp_err_t configureDirection(bool direction);
-    void enable();
-    void disable();
-    void toggle();
-    void bindLocally(Chainable* parent) override;
-
 private:
-    TimerPWM* timer_;
     Gpio* directionPin_;
     bool direction_;
-    int32_t currentSpeed_;
-
 };
 

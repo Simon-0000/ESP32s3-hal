@@ -10,8 +10,9 @@
 class UsbDaemon : public Task{
 public:
     UsbDaemon() : Task("UsbDaemon"){}
+    void addClient(UsbClient& client);
 
-    void linkClient(UsbClient& client);
+protected:
     void run() override;
     void onInit() override;
     void onStop() override;

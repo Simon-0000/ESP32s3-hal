@@ -63,17 +63,25 @@ void UsbClient::run()
     };
     ESP_ERROR_CHECK(usb_host_client_register(&client_config, &driver_.client_hdl));
 
+    //handle connected device on boot up
+    const uint8_t MAX_DEVICE = 1;//TODO modify this to allow more than 1 connected device in the futur
+    int nbrOfDevice;
+    uint8_t deviceList[MAX_DEVICE];
+    usb_host_device_addr_list_fill(MAX_DEVICE, deviceList, &nbrOfDevice);
+    if(nbrOfDevice == 1){
+        ESP_LOGI(TAG, "Device is connected on boot up");
+        ESP_ERROR_CHECK(usb_host_device_open(driver_.client_hdl, deviceList[0], &driver_.dev_hdl));
+        driver_.event = USB_EVENTS::ON_DEVICE_INIT;
+    }
+    //handle client/device connections
     while (true) {
-        usb_host_client_handle_events(driver_.client_hdl, portMAX_DELAY);
-        switch(driver_.event)
+        switch(driver_.event)  
         {
             case USB_EVENTS::ON_DEVICE_INIT:
-                driver_.event = USB_EVENTS::NONE;
                 device_->start();
                 ESP_LOGI(TAG, "done init");
                 break;
             case USB_EVENTS::ON_DEVICE_STOP:
-                driver_.event = USB_EVENTS::NONE;
                 device_->stop();
                 ESP_ERROR_CHECK(usb_host_device_close(driver_.client_hdl, driver_.dev_hdl));
                 driver_.dev_hdl = NULL;
@@ -82,6 +90,9 @@ void UsbClient::run()
             default:
                 break;
         }
+        vTaskDelay(pdMS_TO_TICKS(4));
+        driver_.event = USB_EVENTS::NONE;
+        usb_host_client_handle_events(driver_.client_hdl, portMAX_DELAY);
     }
 }
 

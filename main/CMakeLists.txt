@@ -1,4 +1,4 @@
-idf_component_register(SRCS "usb_host_lib_main.cpp"
+idf_component_register(SRCS "main.cpp"
                     INCLUDE_DIRS "."
                     PRIV_REQUIRES UsbManager Controller
                     )

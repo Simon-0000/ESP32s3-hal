@@ -12,12 +12,11 @@ public:
     UsbClient(UsbDevice* device) :  Task("UsbClient"), device_(device) {device->driver_ = &driver_;}
     virtual ~UsbClient() = default;
 
-
-    void run() override;
-    void onStop() override;
     friend class UsbDaemon;
     friend class UsbDevice;
 protected:
+    void run() override;
+    void onStop() override;
     client_driver_t driver_ = {NULL,NULL, USB_EVENTS::NONE};
 
 private:

@@ -2,7 +2,7 @@
 #include "esp_log.h"
 static const char *TAG = "DAEMON";
 
-void UsbDaemon::linkClient(UsbClient& client){
+void UsbDaemon::addClient(UsbClient& client){
     client.signalingSemaphore_ = &signalingSemaphore_;
 }
 
@@ -25,12 +25,10 @@ void UsbDaemon::run(){
         while (has_clients || has_devices) {
             uint32_t event_flags;
             ESP_ERROR_CHECK(usb_host_lib_handle_events(portMAX_DELAY, &event_flags));
-            if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS) {
+            if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS)
                 has_clients = false;
-            }
-            if (event_flags & USB_HOST_LIB_EVENT_FLAGS_ALL_FREE) {
+            if (event_flags & USB_HOST_LIB_EVENT_FLAGS_ALL_FREE)
                 has_devices = false;
-            }
         }
         ESP_LOGI(TAG, "No clients and devices");
         vTaskDelay(pdMS_TO_TICKS(200)); 
