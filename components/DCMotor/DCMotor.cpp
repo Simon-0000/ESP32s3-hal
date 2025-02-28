@@ -19,3 +19,8 @@ esp_err_t DCMotor::configureDirection(bool direction){
     return ESP_OK;
 }
 
+void DCMotor::syncSelf(){
+    EnableableSmart::syncSelf();
+    if (DCMotor* motor = dynamic_cast<DCMotor*>(parent_))
+        setPwm(motor->currentPwm_);
+}

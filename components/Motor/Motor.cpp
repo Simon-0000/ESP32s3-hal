@@ -18,11 +18,11 @@ void Motor::setPwmTicks(const uint16_t pwmTicks){
     syncChildren();
 }
 
-void Motor::syncSelf() {
-    EnableableSmart::syncSelf();
-    if (Motor* motor = dynamic_cast<Motor*>(parent_))
-        setPwm(motor->currentPwm_);
-}
+// void Motor::syncSelf() {
+//     EnableableSmart::syncSelf();
+//     if (Motor* motor = dynamic_cast<Motor*>(parent_))
+//         setPwm(motor->currentPwm_);
+// }
 
 esp_err_t Motor::enableOnce() {
     return timer_->start();

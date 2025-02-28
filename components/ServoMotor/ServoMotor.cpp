@@ -21,3 +21,9 @@ void ServoMotor::setAngle(int16_t angle){
 
     setPwmTicks(SERVO_MIN_PULSEWIDTH_US + ANGLE_SCALER * (angle-MIN_ANGLE));
 }
+
+void ServoMotor::syncSelf() {
+    EnableableSmart::syncSelf();
+    if (ServoMotor* motor = dynamic_cast<ServoMotor*>(parent_))
+        setAngle(motor->angle_);
+}

@@ -10,7 +10,7 @@
 class Motor : public EnableableSmart{
 public:
     Motor(TimerPWM* pwmTimer);
-    void syncSelf() override;
+    // void syncSelf() override;
 protected:
     void setPwm(const uint16_t speed);
     void setPwmTicks(const uint16_t pwmTicks);
