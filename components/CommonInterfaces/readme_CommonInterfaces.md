@@ -219,8 +219,10 @@ public:
     //MyComponent() : Enableable(isEnabled_) {}// SECOND METHOD used to create the shared_ptr outside
                         // the class, which allows us to control the lifetime and reach of that state
 
-    MyComponent(MyComponent& other) : EnableableSmart(&other) {}// THIRD METHOD USED TO SHARE THE
-                                                                // STATE OF AN OTHER ENABLEABLE OBJECT
+    MyComponent(MyComponent& other) : EnableableSmart(&other) {}// THIRD METHOD used to share the state of an other EnableableSmart object
+                                                                // (CAREFUL, this will not make them share a parent-child link, only the state so enabling 
+                                                                // one wont enable the other, only prevent the other one from calling enableOnce to itself 
+                                                                // after(because it thinks its already enabled)) (ex use case: Motor using a TimerPWM)
 
     void syncSelf() override // OPTIONAL
     {
@@ -279,7 +281,7 @@ private:
 <span>creates a new state variable (shared_ptr) in order to use it in the functions</span>
 
 #### ```EnableableSmart(std::shared_ptr<bool> isEnabled)```
-<span>Use the given shared_ptr as the state variable in order to use it in the functions</span>
+<span>Use the given shared_ptr as the state variable for the class functions</span>
 
 <b>Parameters:</b>
 <ul> 
@@ -291,7 +293,7 @@ private:
 
 <b>Parameters:</b>
 <ul> 
-<li>other -- pointer to a EnableableSmart that will provide its state variable which will be used as the state variable</li>
+<li>other -- pointer to a EnableableSmart that will provide its state variable which will be referenced in the new EnableableSmart instance</li>
 </ul>
 
 #### ```esp_err_t start()```
@@ -337,7 +339,7 @@ private:
 </ul>
 
 #### ```void syncSelf()```
-<span>Function from  the Bindable interface that is overriden in order to sync an object's enabled/disabled state according to its parent's state.</span>
+<span>Function from  the Bindable interface that is overriden in order to sync an object's enabled/disabled state according to its parent's state (Enabling a parent will enable its children and theirs....).</span>
 
 
 ### Protected Functions

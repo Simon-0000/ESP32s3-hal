@@ -9,11 +9,11 @@ DCMotor::DCMotor(TimerPWM* pwmTimer, Gpio* directionPin, bool turnClockwise) :
 }
 
 void DCMotor::setSpeed(const int16_t speed){
-    directionPin_->setState(speed >= 0? direction_ : !direction_);
-    setPwm(static_cast<uint16_t>((abs(speed) << 1) - (speed < 0 ? 1 : 0)));
+    directionPin_->setState(speed < 0? !direction_ : direction_);
+    setPwm(static_cast<uint16_t>((abs(speed) << 1) - static_cast<int16_t>(speed < 0)));
 }
 esp_err_t DCMotor::configureDirection(bool direction){
-    ESP_RETURN_ON_FALSE(directionPin_->isOutput(),ESP_ERR_INVALID_ARG,TAG, "gpio pin should be an output pin");
+    ESP_RETURN_ON_FALSE(directionPin_->isOutput(),ESP_ERR_INVALID_ARG,TAG, "DCMotor: gpio pin should be an output pin");
     directionPin_->setState(direction);
     direction_ = direction;
     return ESP_OK;
