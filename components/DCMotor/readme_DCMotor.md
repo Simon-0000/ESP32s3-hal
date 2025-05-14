@@ -1,46 +1,47 @@
-# Motor Overview
-This component defines a motor base class used by other components in the HAL (ex: [DCMotor](../DCMotor/readme_DCMotor.md), [ServoMotor](../ServoMotor/readme_ServoMotor.md))
+# DCMotor Overview
+This component defines a smart motor interface used by other components in the HAL (ex: [DCMotor](../DCMotor/file.ext))
 
-# Motor - Interface Functional Overview
-Defines a basic motor behavior that is usually implemented by specialized motor components. This interface also implements [EnableableSmart](../CommonInterfaces/readme_CommonInterfaces.md) but overriding the syncSelf method is recommended if a master-slave motor relation is desired. This class also provides the necessary logic to manage the [PWMTimer](../TimerPWM//readme_TimerPWM.md) and the its current value/state.
+# Bindable - Interface Functional Overview
+Makes it possible for objects to bind to each other to form a parent/child relationship and allow them to synchronize their state. Each bindable objects points to an its children through an unordered_set. Each child has a reference to its parent. Rebinding a child to an new parent will restructure the old/new links in order to make them coherent. Note that circular loops may happen if unproperly used ([linkChild](#void-linkchildbindable-child)
+ doesnt check for it).
 
-In order to implement the Motor interface, you'll need to [inherit from Motor and override the syncSelf function (optional)](#make-a-class-motor).
+In order to implement Bindable, you'll need to [inherit from Bindable and override the syncSelf function](#make-a-class-bindable)
+.
 
 </ul>
 
 
 
-## Motor - Application Example
+## Bindable - Application Example
 
 ### Basic Initialization and Usage
 
 ```
 //init the objects
-... timerObjA;
-... motorObjA(&timerObjA);
+... bindableObjA;
+... bindableObjB;
 
-motorObjA.enable();// could have enabled timerObjA instead
-motorObjA.setPwm(INT16_MAX);// forward max speed
-...
-motorObjA.disable();// could have disabled timerObjA instead
-motorObjA.setPwm(323);// warning displayed because the timer is disabled
+
+bindableObjA.linkChild(bindableObjB);// A->B
+bindableObjB.sync();    //will call syncSelf on bindableObjB 
+bindableObjA.sync();    //will call syncSelf on bindableObjA and then on bindableObjB
 ```
 
-### Make a Motor Class
+### Make a Class Bindable
 
 ```
 
 //CMakeLists.txt:
 idf_component_register(.
-                    REQUIRES Motor)
+                    REQUIRES CommonInterfaces)
 
 
 //MyComponent.hpp
-#include "Motor.hpp"
-class MyMotorClass : public Motor{
+#include "Bindable.hpp"
+class MyComponent : public Bindable{
 public:
     ...
-    void syncSelf() override;// OPTIONAL (for master-slave)
+    void syncSelf() override;
 };
 
 ```

@@ -16,7 +16,7 @@ esp_err_t EnableableSmart::start() {
     if(!childrenAreEnabled_)
     {
         childrenAreEnabled_ = true;
-        Bindable::syncChildren();
+        BindableSmart::syncChildren();
     }
     return err;
 }
@@ -32,7 +32,7 @@ esp_err_t EnableableSmart::stop() {
     if(childrenAreEnabled_)
     {
         childrenAreEnabled_ = false;
-        Bindable::syncChildren();
+        BindableSmart::syncChildren();
     }
     return err;
 }
