@@ -19,7 +19,7 @@ extern "C" void app_main(void)
     UsbClient client(&controller);
     
     // bateau.linkChild(&daemon);
-    daemon.linkChild(&client);
+    client.linkTo(&daemon);
 
     daemon.addClient(client);
 

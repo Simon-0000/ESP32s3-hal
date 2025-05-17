@@ -10,7 +10,7 @@ public:
 };
 
 
-class EnableableSmart : public Enableable, public BindableSmart<Bindable>{
+class EnableableSmart : public Enableable, public TypedBindable<Bindable>{
 public:
     EnableableSmart();
     EnableableSmart(std::shared_ptr<bool> isEnabled);

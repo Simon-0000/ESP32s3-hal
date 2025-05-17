@@ -4,7 +4,8 @@
 Motor::Motor(TimerPWM* pwmTimer) : EnableableSmart(pwmTimer),
         timer_(pwmTimer)
 {
-    linkChild(pwmTimer);
+    linkTo(pwmTimer);
+    // linkChild(pwmTimer);
     setPwm(0);
 }
 

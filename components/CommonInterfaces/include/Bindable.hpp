@@ -2,8 +2,8 @@
 #include "esp_err.h"
 #include <unordered_set>
 
-template<typename... ChildrenTypes>
-class BindableSmart;
+template<typename... ParentTypes>
+class TypedBindable;
 
 class Bindable{
 public:
@@ -11,23 +11,26 @@ public:
     virtual void syncSelf() = 0;
     void sync();
     void syncChildren();
-    virtual esp_err_t linkChild(Bindable* child);
+    virtual esp_err_t linkTo(Bindable* parent);
 protected:
-    bool createsCircularity(Bindable* child);
     Bindable* parent_ = nullptr;
     std::unordered_set<Bindable*> children_ = {};
-
 private:
+    bool isInChildrenTree(Bindable* other);
     template<typename...>
-    friend class BindableSmart;
+    friend class TypedBindable;
 };
 
 
-template<typename ...ChildrenTypes>
-class BindableSmart : public Bindable{
+template<typename ...ParentTypes>
+class TypedBindable : public Bindable{
 public:
-    virtual ~BindableSmart() = default;
-    esp_err_t linkChild(Bindable* child) override;
+    virtual ~TypedBindable() = default;
+    esp_err_t linkTo(Bindable* parent) override;
+protected:
+    bool canSyncWithParent_ = false;
+private:
+    bool isLinkable(Bindable* child);
 };
 
 #include "../template/Bindable.tpp"
