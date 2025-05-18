@@ -1,11 +1,8 @@
 #include "Enableable.hpp"
 
 EnableableSmart::EnableableSmart() : isEnabled_(std::make_shared<bool>(false)) {}
-EnableableSmart::EnableableSmart(std::shared_ptr<bool> isEnabled) : isEnabled_(isEnabled){
-}
-
-EnableableSmart::EnableableSmart(const EnableableSmart* other) : isEnabled_(other->isEnabled_){
-}
+EnableableSmart::EnableableSmart(std::shared_ptr<bool> isEnabled) : isEnabled_(isEnabled){}
+EnableableSmart::EnableableSmart(const EnableableSmart* other) : isEnabled_(other->isEnabled_){}
 
 esp_err_t EnableableSmart::start() {
     esp_err_t err = ESP_ERR_INVALID_STATE;
@@ -16,8 +13,9 @@ esp_err_t EnableableSmart::start() {
     if(!childrenAreEnabled_)
     {
         childrenAreEnabled_ = true;
-        TypedBindable::syncChildren();
+        Bindable::syncChildren();
     }
+
     return err;
 }
 
@@ -32,7 +30,7 @@ esp_err_t EnableableSmart::stop() {
     if(childrenAreEnabled_)
     {
         childrenAreEnabled_ = false;
-        TypedBindable::syncChildren();
+        Bindable::syncChildren();
     }
     return err;
 }
@@ -49,10 +47,12 @@ inline bool EnableableSmart::isEnabled() const{
 }
 
 void EnableableSmart::syncSelf() {
-    if(auto enableableParent = dynamic_cast<EnableableSmart*>(Bindable::parent_)) {
-        if(enableableParent->isEnabled())
-            start();
-        else
-            stop();
+    if(parent_){
+        if (auto enableableParent = System::tryCastTo<EnableableSmart,Bindable>(parent_)) {
+            if(enableableParent->isEnabled())
+                start();
+            else
+                stop();
+        }
     }
 }

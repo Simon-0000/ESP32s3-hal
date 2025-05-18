@@ -2,6 +2,8 @@
 #include <memory>
 #include "esp_system.h"
 #include "Bindable.hpp"
+#include "Component.hpp"
+
 class Enableable {
 public:
     ~Enableable() = default;
@@ -10,7 +12,7 @@ public:
 };
 
 
-class EnableableSmart : public Enableable, public TypedBindable<Bindable>{
+class EnableableSmart : public Enableable, public Bindable{
 public:
     EnableableSmart();
     EnableableSmart(std::shared_ptr<bool> isEnabled);
@@ -23,7 +25,10 @@ public:
     inline bool isEnabled() const;
 
     void syncSelf() override;
-
+    bool isIdEqualTo(const uniqueId_t otherId) const override {
+        return System::saveAndGetId<EnableableSmart>() == otherId || Bindable::isIdEqualTo(otherId);
+    }
+    
 protected:
     virtual esp_err_t enableOnce() = 0;
     virtual esp_err_t disableOnce() = 0;

@@ -3,7 +3,7 @@
 #include "Enableable.hpp"
 
 
-enum class TaskStatus {STARTED, STOPPED, SUSPENDED};
+enum class TaskStatus {RUNNING, STOPPED, SUSPENDED};
 
 
 class Task : public EnableableSmart{
