@@ -48,7 +48,7 @@ inline bool EnableableSmart::isEnabled() const{
 
 void EnableableSmart::syncSelf() {
     if(parent_){
-        if (auto enableableParent = System::tryCastTo<EnableableSmart,Bindable>(parent_)) {
+        if (EnableableSmart* enableableParent = System::tryCastTo<EnableableSmart>(parent_)) {
             if(enableableParent->isEnabled())
                 start();
             else

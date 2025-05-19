@@ -35,11 +35,14 @@ esp_err_t Task::enableOnce(){
 
 void Task::syncSelf() {
     EnableableSmart::syncSelf();
-    if (Task* parentTask = dynamic_cast<Task*>(parent_))
+    if (Task* parentTask = System::tryCastTo<Task>(parent_))
         if(parentTask->isSuspended_)
             suspend();
 }
 
+bool Task::isIdEqualTo(const uniqueId_t otherId) const {
+    return System::saveAndGetId<Task>() == otherId || EnableableSmart::isIdEqualTo(otherId);
+}
 
 void Task::runTask(void* pvParameters) {            
     static_cast<Task*>(pvParameters)->run(); 

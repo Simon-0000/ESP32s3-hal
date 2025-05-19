@@ -13,10 +13,8 @@ public:
         return System::saveAndGetId<Bindable>() == otherId;
     }
 protected:
-    virtual void onNewParentLink() {};
-    template<typename T>
-    bool isParentTypeValid(){return dynamic_cast<T>(parent_);}
-    
+    // virtual void onNewParentLink() {};
+
     Bindable* parent_ = nullptr;
     std::vector<Bindable*> children_ = {};
     

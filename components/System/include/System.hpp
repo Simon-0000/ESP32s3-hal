@@ -4,9 +4,10 @@
 typedef uint8_t uniqueId_t;
 
 template<typename T>
-concept IsComponent = requires(T t, uniqueId_t id) {
+concept IsComponent = requires(const T& t, uniqueId_t id) {
     { t.isIdEqualTo(id) } -> std::convertible_to<bool>;
 };
+
 
 class System{
 public:

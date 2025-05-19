@@ -18,6 +18,7 @@ public:
 
     esp_err_t suspend();
     void syncSelf() override;
+    bool isIdEqualTo(const uniqueId_t otherId) const override;
 protected:
     esp_err_t enableOnce() override;
     esp_err_t disableOnce() override;
