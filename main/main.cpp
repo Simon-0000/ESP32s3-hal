@@ -7,25 +7,49 @@
 #include "UsbDaemon.hpp"
 #include "UsbClient.hpp"
 #include "Controller.hpp"
+#include "DCMotor.hpp"
+#include "MCPWM.hpp"
+#include <esp_log.h>
+#include "Gpio.hpp"
+#include "LedCPWM.hpp"
+#include "ServoMotor.hpp"
 // #include "Bateau2025.hpp"
 
 extern "C" void app_main(void)
 {
     //Bateau code commented to protect the competition code of it
-    Controller controller;
+    // Controller controller;
     // Bateau2025 bateau(&controller);
 
-    UsbDaemon daemon;
-    UsbClient client(&controller);
+    // UsbDaemon daemon;
+    // UsbClient client(&controller);
     
-    // bateau.linkChild(&daemon);
-    client.linkTo(&daemon);
+    // // bateau.linkChild(&daemon);
+    // client.linkTo(&daemon);
 
-    daemon.addClient(client);
-
+    // daemon.addClient(client);
+    
     // bateau.start();
+    
+    MCPWM<McpwmConfigs::TimerGroup::GROUP_0> pwm(GPIO_NUM_14, 50, 20000);
+    // Gpio directionPin_(gpio_num_t::GPIO_NUM_8,gpio_mode_t::GPIO_MODE_OUTPUT);
 
+    // DCMotor servoMotor(&mcPWM_,&directionPin_);
+    ServoMotor rudderMotor_(&pwm);
+    // servoMotor.start();
+    // int16_t angle = 0;
+    // pwm.start();
+    rudderMotor_.start();
     while(true){
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        // ESP_LOGW("main","SET %d",static_cast<int>(angle));
+
+        vTaskDelay(500/portTICK_PERIOD_MS);
+        ESP_LOGW("main", "Ticks: %d", pwm.pwmToTicks(UINT16_MAX/4));
+
+        // pwm.setPwm(UINT16_MAX/4);
+        rudderMotor_.setAngle(0);
+        // servoMotor.setSpeed(INT16_MAX/4);
+        // if(angle >= INT16_MAX)
+        //     angle = 0;
     }
 }

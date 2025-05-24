@@ -1,4 +1,5 @@
 #include "ServoMotor.hpp"
+#include "esp_log.h"
 
 static const char* TAG = "ServoMotor";
 
@@ -9,8 +10,6 @@ ServoMotor::ServoMotor(TimerPWM* pwmTimer, const int16_t minAngle, const int16_t
 {    
     if(pwmTimer->getFrequency() != FREQUENCY_REQUIREMENT)
         ESP_LOGE(TAG,"Timer used for Servo, should be at %dHz. This class wasnt build for servos with a different frequency requirements",static_cast<int>(FREQUENCY_REQUIREMENT));
-    
-    
 }
 
 void ServoMotor::setAngle(int16_t angle){

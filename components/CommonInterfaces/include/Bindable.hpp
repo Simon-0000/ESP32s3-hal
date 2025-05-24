@@ -10,8 +10,7 @@ public:
     void syncChildren();
     virtual void syncSelf() = 0;
     virtual esp_err_t linkTo(Bindable* parent);
-
-    protected:
+protected:
     Bindable* parent_ = nullptr;
     std::vector<Bindable*> children_ = {};
 private:

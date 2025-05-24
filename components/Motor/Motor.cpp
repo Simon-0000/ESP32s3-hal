@@ -1,11 +1,10 @@
 #include "Motor.hpp"
 #include <esp_check.h>
+#include "esp_log.h"
 
 Motor::Motor(TimerPWM* pwmTimer) : EnableableSmart(pwmTimer),
         timer_(pwmTimer)
 {
-    linkTo(pwmTimer);
-    // linkChild(pwmTimer);
     setPwm(0);
 }
 

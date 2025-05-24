@@ -25,7 +25,7 @@ public:
     esp_err_t start() override;
     esp_err_t stop() override;
     esp_err_t toggle();
-    inline bool isEnabled() const;
+    bool isEnabled() const;
 
     
 protected:

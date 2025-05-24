@@ -3,10 +3,10 @@
 #include "esp_log.h"
 
 template<ledc_timer_t timer>
-LedCPWM<timer>::LedCPWM(ledc_channel_t channel, int gpioNumber, ledc_timer_bit_t dutyResolution, uint32_t timerFrequencyHz) : TimerPWMAbs(dutyResolution,timerFrequencyHz){
+LedCPWM<timer>::LedCPWM(ledc_channel_t channel, int gpioNumber, ledc_timer_bit_t dutyResolution, uint32_t timerFrequencyHz) : TimerPWMAbs<timer>(dutyResolution, timerFrequencyHz){
     if(timerIsConfigured_)
         ESP_LOGW("LedCPWM", "Redifinition of timer: %d (redefining the frequency)",static_cast<int>(timer));
-
+    timerIsConfigured_ = true;
     const ledc_timer_config_t timerConfig{
         .speed_mode = ledc_mode_t::LEDC_LOW_SPEED_MODE,
         .duty_resolution = dutyResolution,
@@ -48,9 +48,12 @@ void LedCPWM<timer>::setPwmTicks(const uint16_t pwm) {
 
 }
 template<ledc_timer_t timer>
-void LedCPWM<timer>::enableOnce(){
+esp_err_t LedCPWM<timer>::enableOnce(){
+    return ESP_OK;
+
 }
 
 template<ledc_timer_t timer>
-void LedCPWM<timer>::disableOnce(){
+esp_err_t LedCPWM<timer>::disableOnce(){
+    return ESP_OK;
 }

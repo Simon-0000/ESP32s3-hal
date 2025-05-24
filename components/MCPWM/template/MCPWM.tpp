@@ -83,8 +83,9 @@ void MCPWM<groupId>::setPwmTicks(const uint16_t pwmTicks)
 template<TimerGroup groupId>
 esp_err_t MCPWM<groupId>::enableOnce(){
     esp_err_t err = mcpwm_timer_enable(timer_);
-    return err ? mcpwm_timer_start_stop(timer_, MCPWM_TIMER_START_NO_STOP) : err;
-
+    if (err == ESP_OK)
+        err = mcpwm_timer_start_stop(timer_, MCPWM_TIMER_START_NO_STOP);
+    return err;
 }
 template<TimerGroup groupId>
 esp_err_t MCPWM<groupId>::disableOnce(){

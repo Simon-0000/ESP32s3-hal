@@ -1,4 +1,5 @@
 #include "Enableable.hpp"
+#include "esp_log.h"
 
 EnableableSmart::EnableableSmart() : isEnabled_(std::make_shared<bool>(false)) {}
 EnableableSmart::EnableableSmart(std::shared_ptr<bool> isEnabled) : isEnabled_(isEnabled){}
@@ -6,9 +7,10 @@ EnableableSmart::EnableableSmart(const EnableableSmart* other) : isEnabled_(othe
 
 esp_err_t EnableableSmart::start() {
     esp_err_t err = ESP_ERR_INVALID_STATE;
+
     if(*isEnabled_ == false){
+        err = enableOnce();//the order is important
         *isEnabled_ = true;
-        err = enableOnce();
     }
     if(!childrenAreEnabled_)
     {
@@ -42,7 +44,7 @@ esp_err_t EnableableSmart::toggle() {
         return start();
 }
 
-inline bool EnableableSmart::isEnabled() const{
+bool EnableableSmart::isEnabled() const{
     return *isEnabled_;
 }
 

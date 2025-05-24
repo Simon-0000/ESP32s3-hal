@@ -9,7 +9,6 @@ public:
     ServoMotor(TimerPWM* pwmTimer);
     ServoMotor(TimerPWM* pwmTimer, const int16_t minAngle, const int16_t maxAngle);
     void setAngle(int16_t angle);
-    void syncSelf() override;
 private:
     static constexpr uint32_t FREQUENCY_REQUIREMENT = 50;
     static const uint16_t SERVO_MIN_PULSEWIDTH_US = 500;
