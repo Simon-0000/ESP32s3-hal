@@ -40,10 +40,6 @@ void Task::syncSelf() {
             suspend();
 }
 
-bool Task::isIdEqualTo(const uniqueId_t otherId) const {
-    return System::saveAndGetId<Task>() == otherId || EnableableSmart::isIdEqualTo(otherId);
-}
-
 void Task::runTask(void* pvParameters) {            
     static_cast<Task*>(pvParameters)->run(); 
 }

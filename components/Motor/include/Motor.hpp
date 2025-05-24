@@ -7,14 +7,11 @@
 
 
 class Motor : public EnableableSmart{
+    GENERATED_COMPONENT_BODY(Motor,EnableableSmart);
 public:
     Motor(TimerPWM* pwmTimer);
-
     void syncSelf() override;
-    bool isIdEqualTo(const uniqueId_t otherId) const override {
-        return System::saveAndGetId<Motor>() == otherId || EnableableSmart::isIdEqualTo(otherId);
-    };
-
+    
 protected:
     void setPwm(const uint16_t speed);
     void setPwmTicks(const uint16_t pwmTicks);

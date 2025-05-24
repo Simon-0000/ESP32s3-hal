@@ -1,13 +1,5 @@
-#include <cstdint>
-#include <concepts>
-
-typedef uint8_t uniqueId_t;
-
-template<typename T>
-concept IsComponent = requires(const T& t, uniqueId_t id) {
-    { t.isIdEqualTo(id) } -> std::convertible_to<bool>;
-};
-
+#pragma once
+#include "Component.hpp"
 
 class System{
 public:
@@ -32,8 +24,3 @@ private:
     static inline uniqueId_t count8 = 0;
 };
 
-
-class Component2 {
-public:
-    virtual bool isIdEqualTo(const uniqueId_t otherId) const = 0;
-};

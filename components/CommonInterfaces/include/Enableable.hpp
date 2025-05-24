@@ -13,21 +13,20 @@ public:
 
 
 class EnableableSmart : public Enableable, public Bindable{
+    GENERATED_COMPONENT_BODY(EnableableSmart,Bindable);
 public:
     EnableableSmart();
     EnableableSmart(std::shared_ptr<bool> isEnabled);
     EnableableSmart(const EnableableSmart* other);
 
     ~EnableableSmart() = default;
+
+    void syncSelf() override;
     esp_err_t start() override;
     esp_err_t stop() override;
     esp_err_t toggle();
     inline bool isEnabled() const;
 
-    void syncSelf() override;
-    bool isIdEqualTo(const uniqueId_t otherId) const override {
-        return System::saveAndGetId<EnableableSmart>() == otherId || Bindable::isIdEqualTo(otherId);
-    }
     
 protected:
     virtual esp_err_t enableOnce() = 0;
