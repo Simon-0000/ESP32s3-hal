@@ -1,7 +1,12 @@
 #include "BluetoothManager.hpp"
 #include "esp_log.h"
-#define TAG  "BluetoothManager"
+#define TAG_BT_MANAGER  "BluetoothManager"
 
+
+BluetoothManager& BluetoothManager::getInstance() {
+    static BluetoothManager instance = BluetoothManager();        
+    return instance;
+}
 
 static esp_ble_adv_params_t adv_params = {
     .adv_int_min        = 0x20,                      // 20 ms
@@ -15,7 +20,7 @@ static esp_ble_adv_params_t adv_params = {
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
     esp_err_t err;
-    ESP_LOGI(TAG, "GAP_EVT, event %d", event);
+    ESP_LOGI(TAG_BT_MANAGER, "GAP_EVT, event %d", event);
 
     switch (event) {
     case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:
@@ -24,7 +29,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
         //advertising start complete event to indicate advertising start successfully or failed
         if((err = param->adv_start_cmpl.status) != ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGE(TAG, "Advertising start failed: %s", esp_err_to_name(err));
+            ESP_LOGE(TAG_BT_MANAGER, "Advertising start failed: %s", esp_err_to_name(err));
         }
         break;
     default:
@@ -35,17 +40,25 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
 
 static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    ESP_LOGI(TAG, "EVT %d, gatts if %d", event, gatts_if);
-
+    ESP_LOGI(TAG_BT_MANAGER, "EVT %d, gatts if %d", event, gatts_if);
+    
     // /* If event is register event, store the gatts_if for each profile */
-    // if (event == ESP_GATTS_REG_EVT) {
-    //     if (param->reg.status == ESP_GATT_OK) {
-    //         spp_profile_tab[SPP_PROFILE_APP_IDX].gatts_if = gatts_if;
-    //     } else {
-    //         ESP_LOGI(GATTS_TABLE_TAG, "Reg app failed, app_id %04x, status %d",param->reg.app_id, param->reg.status);
-    //         return;
-    //     }
-    // }
+    if (event == ESP_GATTS_REG_EVT) {
+        if (param->reg.status == ESP_GATT_OK) {
+            for(int i = 0; i < BluetoothManager::services.size(); ++i)
+                BluetoothManager::services[i]->registerToGatt(gatts_if);
+        } else {
+            ESP_LOGI(TAG_BT_MANAGER, "Reg app failed, app_id %04x, status %d",param->reg.app_id, param->reg.status);
+            
+        }
+        return;
+    }
+
+    for(int i = 0; i < BluetoothManager::services.size(); ++i) {
+        if (BluetoothManager::services[i]->handleEvent(event, gatts_if, param)) {
+            break; // Event handled
+        }
+    }
 
     // do {
     //     int idx;

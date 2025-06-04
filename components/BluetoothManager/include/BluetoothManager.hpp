@@ -8,14 +8,17 @@
 #include "esp_bt.h"
 #include "esp_spp_api.h"
 #include <esp_gap_bt_api.h>
-
-#pragma once
+#include "BluetoothService.hpp"
 
 
 class BluetoothManager : public Task{
 public:
-    BluetoothManager() : Task("BluetoothManager"){}
+    static BluetoothManager& getInstance();
+    static inline std::vector<BluetoothService*> services = {};
+
 protected:
+    BluetoothManager() : Task("BluetoothManager"){}
+
     void run() override;
     void onInit() override;
     void onStop() override;
@@ -23,5 +26,4 @@ protected:
     void onResume() override;
 private:
     static constexpr bool USE_SSP = true;
-    
 };

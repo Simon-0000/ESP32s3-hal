@@ -41,7 +41,10 @@ extern "C" void app_main(void)
     // int16_t angle = 0;
     // pwm.start();
     // rudderMotor_.start();
-    BluetoothManager manager;
+    BluetoothManager manager = BluetoothManager::getInstance();
+    BluetoothService service(4);
+    manager.services.push_back(&service);
+
     manager.start();
     while(true){
         vTaskDelay(pdMS_TO_TICKS(100));
