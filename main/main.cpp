@@ -14,6 +14,7 @@
 #include "LedCPWM.hpp"
 #include "ServoMotor.hpp"
 #include "BluetoothManager.hpp"
+#include "BluetoothBasicRobot.hpp"
 // #include "Bateau2025.hpp"
 
 extern "C" void app_main(void)
@@ -42,7 +43,7 @@ extern "C" void app_main(void)
     // pwm.start();
     // rudderMotor_.start();
     BluetoothManager manager = BluetoothManager::getInstance();
-    BluetoothService service(4);
+    BluetoothBasicRobot service(4);
     manager.services.push_back(&service);
 
     manager.start();

@@ -15,11 +15,17 @@ public:
     BluetoothService(uint8_t priority);
     void registerToGatt(esp_gatt_if_t gattIf);
     bool handleEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param);
+    
+    virtual void onServiceCreate(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) = 0;
+    virtual void onReadRequest(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) {}
+    virtual void onWriteRequest(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) {}
+
+protected:
+    uint16_t serviceHandle_;
 
 private:
     static constexpr uint8_t UUID_LENGTH_BYTES = 16;
     uint8_t uuid_[UUID_LENGTH_BYTES];
     esp_gatt_if_t gattIf_;
     uint8_t priority_;
-    uint16_t serviceHandle_;
 };
