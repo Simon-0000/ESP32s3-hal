@@ -11,7 +11,7 @@ esp_err_t EnableableSmart::start() {
     if(*isEnabled_ == false){
         err = enableOnce();//the order is important
         *isEnabled_ = true;
-        Bindable::syncChildren(System::getUniqueId<EnableableSmart>());
+        Syncable::syncChildren(System::getUniqueId<EnableableSmart>());
 
     }
     if(!childrenAreEnabled_)
@@ -28,7 +28,7 @@ esp_err_t EnableableSmart::stop() {
     if(*isEnabled_){
         err = disableOnce();
         *isEnabled_ = false;
-        Bindable::syncChildren(System::getUniqueId<EnableableSmart>());
+        Syncable::syncChildren(System::getUniqueId<EnableableSmart>());
     }
     return err;
 }

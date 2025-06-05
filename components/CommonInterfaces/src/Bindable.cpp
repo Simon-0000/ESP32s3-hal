@@ -1,6 +1,6 @@
 #include "Bindable.hpp"
 
-void Bindable::syncChildren(uint8_t eventId){
+void Syncable::syncChildren(uint8_t eventId){
     for (int i = 0; i < children_.size(); ++i) {
         children_[i]->syncSelf(eventId);
         children_[i]->syncChildren(eventId);
@@ -8,7 +8,7 @@ void Bindable::syncChildren(uint8_t eventId){
     }
 }
 
-bool Bindable::isInChildrenTree(Bindable* other) {
+bool Syncable::isInChildrenTree(Syncable* other) {
     for (int i = 0; i < children_.size(); ++i) {
         if(other == children_[i])
             return true;
@@ -18,7 +18,7 @@ bool Bindable::isInChildrenTree(Bindable* other) {
     return false;
 }
 
-esp_err_t Bindable::linkTo(Bindable* parent) {
+esp_err_t Syncable::linkTo(Syncable* parent) {
     if(this == parent )//TODO add warning logs here as well
         return ESP_ERR_INVALID_ARG;
     else if(parent_ == parent || isInChildrenTree(parent))

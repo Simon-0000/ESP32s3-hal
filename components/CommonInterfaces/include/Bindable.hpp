@@ -2,16 +2,16 @@
 #include "esp_err.h"
 #include <vector>
 
-class Bindable{
+class Syncable{
 public:
-    virtual ~Bindable() = default;
+    virtual ~Syncable() = default;
     void syncChildren(uint8_t eventId);
     virtual void syncSelf(uint8_t eventId) = 0;
-    virtual esp_err_t linkTo(Bindable* parent);
+    virtual esp_err_t linkTo(Syncable* parent);
 protected:
-    Bindable* parent_ = nullptr;
-    std::vector<Bindable*> children_ = {};
+    Syncable* parent_ = nullptr;
+    std::vector<Syncable*> children_ = {};
 private:
-    bool isInChildrenTree(Bindable* other);
+    bool isInChildrenTree(Syncable* other);
 };
     
