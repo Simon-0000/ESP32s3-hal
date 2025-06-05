@@ -1,9 +1,9 @@
 #include "Bindable.hpp"
 
-void Bindable::syncChildren(){
+void Bindable::syncChildren(uint8_t eventId){
     for (int i = 0; i < children_.size(); ++i) {
-        children_[i]->syncSelf();
-        children_[i]->syncChildren();
+        children_[i]->syncSelf(eventId);
+        children_[i]->syncChildren(eventId);
 
     }
 }

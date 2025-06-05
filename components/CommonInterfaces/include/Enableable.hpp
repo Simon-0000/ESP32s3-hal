@@ -2,7 +2,7 @@
 #include <memory>
 #include "esp_system.h"
 #include "Bindable.hpp"
-#include "Component.hpp"
+#include "System.hpp"
 
 class Enableable {
 public:
@@ -13,7 +13,6 @@ public:
 
 
 class EnableableSmart : public Enableable, public Bindable{
-    GENERATED_COMPONENT_BODY(EnableableSmart,Bindable);
 public:
     EnableableSmart();
     EnableableSmart(std::shared_ptr<bool> isEnabled);
@@ -21,7 +20,7 @@ public:
 
     ~EnableableSmart() = default;
 
-    void syncSelf() override;
+    void syncSelf(uint8_t eventId) override;
     esp_err_t start() override;
     esp_err_t stop() override;
     esp_err_t toggle();

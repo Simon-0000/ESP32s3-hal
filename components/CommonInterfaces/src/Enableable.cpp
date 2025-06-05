@@ -11,11 +11,12 @@ esp_err_t EnableableSmart::start() {
     if(*isEnabled_ == false){
         err = enableOnce();//the order is important
         *isEnabled_ = true;
+        Bindable::syncChildren(System::getUniqueId<EnableableSmart>());
+
     }
     if(!childrenAreEnabled_)
     {
         childrenAreEnabled_ = true;
-        Bindable::syncChildren();
     }
 
     return err;
@@ -25,14 +26,9 @@ esp_err_t EnableableSmart::stop() {
     esp_err_t err = ESP_ERR_INVALID_STATE;
 
     if(*isEnabled_){
-        *isEnabled_ = false;
         err = disableOnce();
-    }
-
-    if(childrenAreEnabled_)
-    {
-        childrenAreEnabled_ = false;
-        Bindable::syncChildren();
+        *isEnabled_ = false;
+        Bindable::syncChildren(System::getUniqueId<EnableableSmart>());
     }
     return err;
 }
@@ -48,13 +44,11 @@ bool EnableableSmart::isEnabled() const{
     return *isEnabled_;
 }
 
-void EnableableSmart::syncSelf() {
-    if(parent_){
-        if (EnableableSmart* enableableParent = System::tryCastTo<EnableableSmart>(parent_)) {
-            if(enableableParent->isEnabled())
-                start();
-            else
-                stop();
-        }
+void EnableableSmart::syncSelf(uint8_t eventId) {
+    if(parent_ && eventId == System::getUniqueId<EnableableSmart>()){
+        if(static_cast<EnableableSmart*>(parent_)->isEnabled())
+            start();
+        else
+            stop();
     }
 }

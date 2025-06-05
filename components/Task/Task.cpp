@@ -33,11 +33,13 @@ esp_err_t Task::enableOnce(){
     
 }
 
-void Task::syncSelf() {
-    EnableableSmart::syncSelf();
-    if (Task* parentTask = System::tryCastTo<Task>(parent_))
-        if(parentTask->isSuspended_)
+void Task::syncSelf(uint8_t eventId) {
+    EnableableSmart::syncSelf(eventId);
+    if(parent_ && eventId == System::getUniqueId<Task>()){
+        if(static_cast<Task*>(parent_)->isSuspended_)
             suspend();
+    }
+
 }
 
 void Task::runTask(void* pvParameters) {            

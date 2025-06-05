@@ -7,10 +7,9 @@
 
 
 class Motor : public EnableableSmart{
-    GENERATED_COMPONENT_BODY(Motor,EnableableSmart);
 public:
     Motor(TimerPWM* pwmTimer);
-    void syncSelf() override;
+    void syncSelf(uint8_t eventId) override;
     
 protected:
     void setPwm(const uint16_t speed);

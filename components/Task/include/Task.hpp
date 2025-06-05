@@ -7,8 +7,6 @@ enum class TaskStatus {RUNNING, STOPPED, SUSPENDED};
 
 
 class Task : public EnableableSmart{
-GENERATED_COMPONENT_BODY(Task,EnableableSmart);
-
 public:
     enum CoreId {PROTOCOL_CPU = 0, APP_CPU = 1, AUTOMATIC_CPU = tskNO_AFFINITY};
 
@@ -19,7 +17,7 @@ public:
     virtual ~Task() = default;
     
     esp_err_t suspend();
-    void syncSelf() override;
+    void syncSelf(uint8_t) override;
 
 protected:
     esp_err_t enableOnce() override;
